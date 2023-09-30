@@ -1,0 +1,56 @@
+###
+#
+# @file make.inc.example
+#
+#  PLASMA is a software package provided by Univ. of Tennessee,
+#  Univ. of California Berkeley and Univ. of Colorado Denver
+#
+# @version 2.8.0
+# @author Julie Langou
+# @author Mathieu Faverge
+# @date 2010-11-15
+#
+###
+
+# Those variables have to be changed accordingly!
+# Compilers, linker/loaders, the archiver, and their options.
+
+# Install directory
+prefix    = /opt/local
+
+# To speed up the compilation
+MAKE      = make -j
+
+CC        = icc
+FC        = ifort
+LOADER    = ifort
+
+ARCH      = ar
+ARCHFLAGS = cr
+RANLIB    = ranlib
+
+CFLAGS    = -O2 -DADD_ -diag-disable vec
+FFLAGS    = -O2 -fltconsistency -fp_port
+LDFLAGS   = -O2 -nofor_main
+
+# To compile Fortran 90 interface
+PLASMA_F90 =  1
+
+# To compile Plasma with EZTrace library in order to trace events
+# (Don't forget to set correctly PKG_CONFIG_PATH to make `pkg-config --libs eztrace` works)
+PLASMA_TRACE= 0
+
+# By sequential kernel
+# CFLAGS += -DTRACE_BY_KERNEL
+
+# By parallel plasma function (Works only with dynamic scheduler)
+# CFLAGS += -DTRACE_BY_FUNCTION
+
+# Blas Library
+LIBBLAS     = -L/path/to/externallibs/lib -lrefblas
+# CBlas library
+LIBCBLAS    = -L/path/to/externallibs/lib -lcblas
+# lapack and tmg library (lapack is included in acml)
+LIBLAPACK   = -L/path/to/externallibs/lib -ltmg -llapack
+INCCLAPACK  = -I/path/to/externallibs/include
+LIBCLAPACK  = -L/path/to/externallibs/lib -llapacke
