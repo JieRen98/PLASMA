@@ -2,6 +2,7 @@
 #define CBLAS_H
 #include <stddef.h>
 
+#ifndef MKL
 /*
  * Enumerated and derived types
  */
@@ -575,5 +576,7 @@ void cblas_xerbla(int p, const char *rout, const char *form, ...);
 }
 #endif
 
-
+#else
+#include <mkl.h>
+#endif
 #endif
