@@ -1,9 +1,8 @@
-cmake_minimum_required(VERSION 3.26)
-project(minimal_ppotrf)
+cmake_minimum_required(VERSION 3.15)
+project(minimal_plasma)
 
 enable_language(C)
 enable_language(CXX)
-set(CMAKE_CXX_STANDARD 17)
 
 find_package(BLAS REQUIRED)
 
@@ -70,12 +69,12 @@ set(PLASMA_SOURCE
         #  compute/pdlauum.c
 )
 
-add_library(PLASMA STATIC ${PLASMA_SOURCE})
-target_include_directories(PLASMA PRIVATE control include quark compute)
-target_compile_definitions(PLASMA PRIVATE $<$<COMPILE_LANGUAGE:C>:ADD_>)
-target_link_libraries(PLASMA PRIVATE BLAS::BLAS)
+add_library(plasma STATIC ${PLASMA_SOURCE})
+target_include_directories(plasma PRIVATE control include quark compute)
+target_compile_definitions(plasma PRIVATE $<$<COMPILE_LANGUAGE:C>:ADD_>)
+target_link_libraries(plasma PRIVATE BLAS::BLAS)
 
 add_executable(example_dpotrf examples/example_dpotrf.c)
 target_include_directories(example_dpotrf PRIVATE control include quark)
-target_link_libraries(example_dpotrf PRIVATE PLASMA)
+target_link_libraries(example_dpotrf PRIVATE plasma)
 

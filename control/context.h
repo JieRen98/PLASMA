@@ -83,6 +83,8 @@ typedef struct plasma_context_struct {
 
     /* Dynamic scheduler */
     Quark *quark;
+
+    void *aux;
 } plasma_context_t;
 
 /***************************************************************************//**
