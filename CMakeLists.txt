@@ -70,11 +70,32 @@ set(PLASMA_SOURCE
 )
 
 add_library(plasma STATIC ${PLASMA_SOURCE})
-target_include_directories(plasma PRIVATE control include quark compute)
+target_include_directories(plasma PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/control>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/quark>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/compute>
+        $<INSTALL_INTERFACE:include>
+)
 target_compile_definitions(plasma PRIVATE $<$<COMPILE_LANGUAGE:C>:ADD_>)
-target_link_libraries(plasma PRIVATE BLAS::BLAS)
+find_package(BLAS REQUIRED)
+target_link_libraries(plasma PUBLIC BLAS::BLAS)
+target_compile_options(plasma PRIVATE $<$<COMPILE_LANGUAGE:C>:-O3>)
+
+install(TARGETS plasma
+        EXPORT plasmaTargets
+        DESTINATION plasma)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/control/ DESTINATION include)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION include)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/quark/ DESTINATION include)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/compute/ DESTINATION include)
+
+install(EXPORT plasmaTargets
+        FILE plasmaTargets.cmake
+        NAMESPACE PLASMA::
+        DESTINATION lib/cmake/PLASMA
+)
 
 add_executable(example_dpotrf examples/example_dpotrf.c)
-target_include_directories(example_dpotrf PRIVATE control include quark)
 target_link_libraries(example_dpotrf PRIVATE plasma)
-
+target_compile_options(example_dpotrf PRIVATE $<$<COMPILE_LANGUAGE:C>:-O3>)
