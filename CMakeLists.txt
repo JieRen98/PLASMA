@@ -4,11 +4,6 @@ project(minimal_plasma)
 enable_language(C)
 enable_language(CXX)
 
-find_package(BLAS REQUIRED)
-
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3")
-
 set(PLASMA_SOURCE
         control/control.c
         control/descriptor.c
@@ -71,31 +66,44 @@ set(PLASMA_SOURCE
 
 add_library(plasma STATIC ${PLASMA_SOURCE})
 target_include_directories(plasma PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/control>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/quark>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/compute>
+        $<INSTALL_INTERFACE:include>
+)
+
+target_include_directories(plasma PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/control>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/quark>
         $<INSTALL_INTERFACE:include>
 )
 target_compile_definitions(plasma PRIVATE $<$<COMPILE_LANGUAGE:C>:ADD_>)
-find_package(BLAS REQUIRED)
+find_package(MKL)
+if (NOT ${MKL_FOUND})
+    find_package(BLAS REQUIRED)
+    find_package(LAPACK REQUIRED)
+endif ()
 find_package(OpenMP REQUIRED)
-target_link_libraries(plasma PUBLIC BLAS::BLAS OpenMP::OpenMP_C)
+if (${MKL_FOUND})
+    target_link_libraries(plasma PRIVATE MKL::MKL)
+else ()
+    target_link_libraries(plasma PRIVATE BLAS::BLAS LAPACK::LAPACK lapacke)
+endif ()
+target_link_libraries(plasma PRIVATE OpenMP::OpenMP_C)
 target_compile_options(plasma PRIVATE $<$<COMPILE_LANGUAGE:C>:-O3>)
 
-install(TARGETS plasma
-        EXPORT plasmaTargets
-        DESTINATION plasma)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/control/ DESTINATION include)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION include)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/quark/ DESTINATION include)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/compute/ DESTINATION include)
-
-install(EXPORT plasmaTargets
-        FILE plasmaTargets.cmake
-        NAMESPACE PLASMA::
-        DESTINATION lib/cmake/PLASMA
-)
+#install(TARGETS plasma
+#        EXPORT plasmaTargets
+#        DESTINATION plasma)
+#install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/control/ DESTINATION include)
+#install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION include)
+#install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/quark/ DESTINATION include)
+#install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/compute/ DESTINATION include)
+#
+#install(EXPORT plasmaTargets
+#        FILE plasmaTargets.cmake
+#        NAMESPACE PLASMA::
+#        DESTINATION lib/cmake/PLASMA
+#)
 
 add_executable(example_dpotrf examples/example_dpotrf.c)
 target_link_libraries(example_dpotrf PRIVATE plasma)
