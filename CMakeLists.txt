@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.15)
 project(minimal_plasma)
 
 enable_language(C)
-enable_language(CXX)
 
 set(PLASMA_SOURCE
         control/control.c
@@ -73,18 +72,19 @@ target_include_directories(plasma PUBLIC
 
 target_include_directories(plasma PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/control>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/quark>
         $<INSTALL_INTERFACE:include>
 )
 target_compile_definitions(plasma PRIVATE $<$<COMPILE_LANGUAGE:C>:ADD_>)
 find_package(MKL)
 if (NOT ${MKL_FOUND})
+    message(STATUS "MKL NOT FOUND")
     find_package(BLAS REQUIRED)
     find_package(LAPACK REQUIRED)
 endif ()
 find_package(OpenMP REQUIRED)
 if (${MKL_FOUND})
     target_link_libraries(plasma PRIVATE MKL::MKL)
+    target_compile_definitions(plasma PUBLIC $<$<COMPILE_LANGUAGE:C>:PLASMA_WITH_MKL>)
 else ()
     target_link_libraries(plasma PRIVATE BLAS::BLAS LAPACK::LAPACK lapacke)
 endif ()
