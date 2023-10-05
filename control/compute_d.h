@@ -102,6 +102,9 @@ void plasma_pdplgsy (plasma_context_t *plasma);
 void plasma_pdplgsy (plasma_context_t *plasma);
 void plasma_pdpltmg(plasma_context_t *plasma);
 void plasma_pdpotrf (plasma_context_t *plasma);
+#ifdef PLASMA_WITH_CUDA
+void plasma_pdpotrf_gpu (plasma_context_t *plasma);
+#endif
 void plasma_pdshift (plasma_context_t *plasma);
 void plasma_pdsymm  (plasma_context_t *plasma);
 void plasma_pdsyrk  (plasma_context_t *plasma);
@@ -204,6 +207,9 @@ void plasma_pdpltmg_circul_quark( PLASMA_desc A, unsigned long long int seed, PL
 void plasma_pdpltmg_chebvand_quark( PLASMA_desc A, PLASMA_sequence *sequence, PLASMA_request *request );
 void plasma_pdpltmg_hankel_quark( PLASMA_desc A, unsigned long long int seed, PLASMA_sequence *sequence, PLASMA_request *request );
 void plasma_pdpotrf_quark(PLASMA_enum uplo, PLASMA_desc A, PLASMA_sequence *sequence, PLASMA_request *request);
+#ifdef PLASMA_WITH_CUDA
+void plasma_pdpotrf_gpu_quark(PLASMA_enum uplo, PLASMA_desc A, PLASMA_sequence *sequence, PLASMA_request *request);
+#endif
 void plasma_pdshift_quark(int, int, int, double *, int *, int, int, int, PLASMA_sequence*, PLASMA_request*);
 void plasma_pdstedc_quark(PLASMA_enum compz, int matsiz, double *D, double *E, double *Z, int LDZ, PLASMA_sequence *sequence, PLASMA_request *request);
 void plasma_pdswaps_quark(int n, int *perm, double *Z, int LDZ, double *work, PLASMA_sequence *sequence, PLASMA_request *request);

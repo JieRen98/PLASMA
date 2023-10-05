@@ -82,6 +82,9 @@ int PLASMA_dplrnt( int M, int N, double *A, int LDA, unsigned long long int seed
 int PLASMA_dpltmg( PLASMA_enum mtxtype, int M, int N, double *A, int LDA, unsigned long long int seed);
 int PLASMA_dposv(PLASMA_enum uplo, int N, int NRHS, double *A, int LDA, double *B, int LDB);
 int PLASMA_dpotrf(PLASMA_enum uplo, int N, double *A, int LDA);
+#ifdef PLASMA_WITH_CUDA
+int PLASMA_dpotrf_gpu(PLASMA_enum uplo, int N, double *A, int LDA);
+#endif
 int PLASMA_dpotri(PLASMA_enum uplo, int N, double *A, int LDA);
 int PLASMA_dpotrs(PLASMA_enum uplo, int N, int NRHS, double *A, int LDA, double *B, int LDB);
 int PLASMA_dstedc(PLASMA_enum jobz, int n, double *D, double *E, double *Z, int LDZ);
@@ -159,6 +162,9 @@ int PLASMA_dplrnt_Tile(PLASMA_desc *A, unsigned long long int seed);
 int PLASMA_dpltmg_Tile(PLASMA_enum mtxtype, PLASMA_desc *A, unsigned long long int seed);
 int PLASMA_dposv_Tile(PLASMA_enum uplo, PLASMA_desc *A, PLASMA_desc *B);
 int PLASMA_dpotrf_Tile(PLASMA_enum uplo, PLASMA_desc *A);
+#ifdef PLASMA_WITH_CUDA
+int PLASMA_dpotrf_gpu_Tile(PLASMA_enum uplo, PLASMA_desc *A);
+#endif
 int PLASMA_dpotri_Tile(PLASMA_enum uplo, PLASMA_desc *A);
 int PLASMA_dpotrs_Tile(PLASMA_enum uplo, PLASMA_desc *A, PLASMA_desc *B);
 int PLASMA_dsymm_Tile(PLASMA_enum side, PLASMA_enum uplo, double alpha, PLASMA_desc *A, PLASMA_desc *B, double beta, PLASMA_desc *C);
@@ -232,6 +238,9 @@ int PLASMA_dplrnt_Tile_Async(PLASMA_desc *A, unsigned long long int seed, PLASMA
 int PLASMA_dpltmg_Tile_Async(PLASMA_enum mtxtype, PLASMA_desc *A, unsigned long long int seed, PLASMA_sequence *sequence, PLASMA_request *request);
 int PLASMA_dposv_Tile_Async(PLASMA_enum uplo, PLASMA_desc *A, PLASMA_desc *B, PLASMA_sequence *sequence, PLASMA_request *request);
 int PLASMA_dpotrf_Tile_Async(PLASMA_enum uplo, PLASMA_desc *A, PLASMA_sequence *sequence, PLASMA_request *request);
+#ifdef PLASMA_WITH_CUDA
+int PLASMA_dpotrf_gpu_Tile_Async(PLASMA_enum uplo, PLASMA_desc *A, PLASMA_sequence *sequence, PLASMA_request *request);
+#endif
 int PLASMA_dpotri_Tile_Async(PLASMA_enum uplo, PLASMA_desc *A, PLASMA_sequence *sequence, PLASMA_request *request);
 int PLASMA_dpotrs_Tile_Async(PLASMA_enum uplo, PLASMA_desc *A, PLASMA_desc *B, PLASMA_sequence *sequence, PLASMA_request *request);
 int PLASMA_dsymm_Tile_Async(PLASMA_enum side, PLASMA_enum uplo, double alpha, PLASMA_desc *A, PLASMA_desc *B, double beta, PLASMA_desc *C, PLASMA_sequence *sequence, PLASMA_request *request);

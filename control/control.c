@@ -279,8 +279,24 @@ int PLASMA_Init_Affinity(int cores, int *coresbind)
     /* Assign rank and thread ID for the master */
     plasma->thread_rank[0] = 0;
     plasma->thread_id[0] = pthread_self();
+#ifdef PLASMA_WITH_CUDA
+    cudaStreamCreateWithFlags(&plasma->cuda_stream[0], cudaStreamNonBlocking);
+    cublasCreate(&plasma->cublas_handle[0]);
+    cublasSetStream(plasma->cublas_handle[0], plasma->cuda_stream[0]);
+    cusolverDnCreate(&plasma->cusolver_handle[0]);
+    cusolverDnCreateParams(&plasma->cusolver_params[0]);
+    cusolverDnSetStream(plasma->cusolver_handle[0], plasma->cuda_stream[0]);
+#endif
 
     for (core = 1; core < plasma->world_size; core++) {
+#ifdef PLASMA_WITH_CUDA
+        cudaStreamCreateWithFlags(&plasma->cuda_stream[core], cudaStreamNonBlocking);
+        cublasCreate(&plasma->cublas_handle[core]);
+        cublasSetStream(plasma->cublas_handle[core], plasma->cuda_stream[core]);
+        cusolverDnCreate(&plasma->cusolver_handle[core]);
+        cusolverDnCreateParams(&plasma->cusolver_params[core]);
+        cusolverDnSetStream(plasma->cusolver_handle[core], plasma->cuda_stream[core]);
+#endif
         plasma->thread_rank[core] = core;
         pthread_create(
             &plasma->thread_id[core],
@@ -346,8 +362,18 @@ int PLASMA_Finalize()
     plasma_barrier(plasma);
     plasma->action = PLASMA_ACT_STAND_BY;
 
+    cudaStreamDestroy(plasma->cuda_stream[0]);
+    cublasDestroy(plasma->cublas_handle[0]);
+    cusolverDnDestroy(plasma->cusolver_handle[0]);
+    cusolverDnDestroyParams(plasma->cusolver_params[0]);
+
     // Join threads
     for (core = 1; core < plasma->world_size; core++) {
+        cudaStreamDestroy(plasma->cuda_stream[core]);
+        cublasDestroy(plasma->cublas_handle[core]);
+        cusolverDnDestroy(plasma->cusolver_handle[core]);
+        cusolverDnDestroyParams(plasma->cusolver_params[core]);
+
         status = pthread_join(plasma->thread_id[core], &exitcodep);
         if (status != 0) {
             plasma_fatal_error("PLASMA_Finalize", "pthread_join() failed");

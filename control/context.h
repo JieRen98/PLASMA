@@ -16,6 +16,10 @@
 
 #include <stdio.h>
 #include "quark.h"
+#ifdef PLASMA_WITH_CUDA
+#include <cuda_runtime_api.h>
+#include <cusolverDn.h>
+#endif
 
 struct plasma_context_struct;
 
@@ -85,6 +89,13 @@ typedef struct plasma_context_struct {
     Quark *quark;
 
     void *aux;
+
+#ifdef PLASMA_WITH_CUDA
+    cudaStream_t cuda_stream[CONTEXT_THREADS_MAX];
+    cublasHandle_t cublas_handle[CONTEXT_THREADS_MAX];
+    cusolverDnHandle_t cusolver_handle[CONTEXT_THREADS_MAX];
+    cusolverDnParams_t cusolver_params[CONTEXT_THREADS_MAX];
+#endif
 } plasma_context_t;
 
 /***************************************************************************//**

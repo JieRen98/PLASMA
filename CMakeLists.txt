@@ -63,6 +63,14 @@ set(PLASMA_SOURCE
         #  compute/pdlauum.c
 )
 
+find_package(CUDAToolkit)
+if (${CUDAToolkit_FOUND})
+    list(APPEND PLASMA_SOURCE
+            compute/pdpotrf_gpu.c
+            compute/dpotrf_gpu.c
+    )
+endif ()
+
 add_library(plasma STATIC ${PLASMA_SOURCE})
 target_include_directories(plasma PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -75,6 +83,10 @@ target_include_directories(plasma PRIVATE
         $<INSTALL_INTERFACE:include>
 )
 target_compile_definitions(plasma PRIVATE $<$<COMPILE_LANGUAGE:C>:ADD_>)
+if (${CUDAToolkit_FOUND})
+    target_compile_definitions(plasma PUBLIC $<$<COMPILE_LANGUAGE:C>:PLASMA_WITH_CUDA>)
+    target_link_libraries(plasma PRIVATE CUDA::cudart CUDA::cublas CUDA::cusolver)
+endif ()
 find_package(MKL)
 if (NOT ${MKL_FOUND})
     message(STATUS "MKL NOT FOUND")
@@ -108,3 +120,7 @@ target_compile_options(plasma PRIVATE $<$<COMPILE_LANGUAGE:C>:-O3>)
 add_executable(example_dpotrf examples/example_dpotrf.c)
 target_link_libraries(example_dpotrf PRIVATE plasma)
 target_compile_options(example_dpotrf PRIVATE $<$<COMPILE_LANGUAGE:C>:-O3>)
+
+add_executable(example_dpotrf_gpu examples/example_dpotrf_gpu.c)
+target_link_libraries(example_dpotrf_gpu PRIVATE plasma)
+target_compile_options(example_dpotrf_gpu PRIVATE $<$<COMPILE_LANGUAGE:C>:-O3>)
