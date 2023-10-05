@@ -79,7 +79,8 @@ target_include_directories(plasma PUBLIC
 )
 target_compile_definitions(plasma PRIVATE $<$<COMPILE_LANGUAGE:C>:ADD_>)
 find_package(BLAS REQUIRED)
-target_link_libraries(plasma PUBLIC BLAS::BLAS)
+find_package(OpenMP REQUIRED)
+target_link_libraries(plasma PUBLIC BLAS::BLAS OpenMP::OpenMP_C)
 target_compile_options(plasma PRIVATE $<$<COMPILE_LANGUAGE:C>:-O3>)
 
 install(TARGETS plasma
